@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jogos do Conhecimento - 8 Jogos</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
+  <style>
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial,Helvetica,sans-serif;
+      color:#fff;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(255,0,153,.18), transparent 24%),
+        radial-gradient(circle at 80% 15%, rgba(0,255,255,.14), transparent 22%),
+        radial-gradient(circle at 50% 100%, rgba(255,215,0,.14), transparent 24%),
+        linear-gradient(135deg,#090012,#160028 45%,#05000d);
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+    body::before{
+      content:"";
+      position:fixed; inset:0; pointer-events:none; opacity:.18;
+      background-image:
+        radial-gradient(#fff 1px, transparent 1px),
+        radial-gradient(#ffd700 1px, transparent 1px);
+      background-size:50px 50px, 90px 90px;
+      background-position:0 0, 25px 25px;
+      animation:stars 12s linear infinite;
+    }
+    @keyframes stars{to{background-position:0 120px,25px 180px}}
+    .container{width:min(1280px,95%);margin:auto;padding:18px 0 30px}
+    .title{
+      text-align:center;
+      font-size:clamp(32px,5vw,60px);
+      margin:8px 0 8px;
+      color:#ffd44a;
+      font-weight:900;
+      letter-spacing:2px;
+      text-shadow:0 0 14px #ffea9f,0 0 28px #ff9800;
+    }
+    .subtitle{
+      text-align:center;
+      color:#ddd3ff;
+      margin-bottom:16px;
+      font-size:18px;
+    }
+    .topbar{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:12px;
+      margin-bottom:18px;
+    }
+    .card{
+      background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.04));
+      border:1px solid rgba(255,255,255,.16);
+      border-radius:18px;
+      padding:14px 16px;
+      box-shadow:0 10px 35px rgba(0,0,0,.35), inset 0 0 22px rgba(255,255,255,.05);
+      backdrop-filter:blur(8px);
+    }
+    .stat-title{font-size:12px;color:#d7cbff;text-transform:uppercase;letter-spacing:1px}
+    .stat-value{font-size:28px;font-weight:900;margin-top:4px;color:#ffd44a;text-shadow:0 0 12px rgba(255,215,0,.55)}
+    .menu-grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:16px;
+    }
+    .game-card{
+      cursor:pointer;
+      min-height:165px;
+      transition:.25s;
+      position:relative;
+      overflow:hidden;
+    }
+    .game-card:hover{transform:translateY(-6px) scale(1.02); box-shadow:0 0 30px rgba(255,215,0,.18),0 0 25px rgba(0,255,255,.08)}
+    .game-card h3{margin:0 0 8px; font-size:23px; color:#fff59d}
+    .game-card p{margin:0;color:#efe8ff;line-height:1.5;font-size:14px}
+    .tag{
+      display:inline-block;
+      padding:5px 10px;
+      border-radius:999px;
+      background:linear-gradient(90deg,#ffd44a,#ff9f1a);
+      color:#1b0b00;
+      font-weight:900;
+      font-size:11px;
+      margin-bottom:10px;
+    }
+    .screen{display:none}
+    .screen.active{display:block}
+    .play-area{
+      margin-top:16px;
+      display:grid;
+      grid-template-columns:320px 1fr;
+      gap:18px;
+      align-items:start;
+    }
+    .side h2,.main h2{margin:0 0 12px}
+    .btn,button{
+      border:none;
+      border-radius:14px;
+      padding:12px 16px;
+      cursor:pointer;
+      font-weight:900;
+      transition:.2s;
+      font-size:15px;
+    }
+    .btn:hover,button:hover{transform:translateY(-2px); filter:brightness(1.08)}
+    .btn-primary{background:linear-gradient(90deg,#ff2bd6,#7e42ff,#00d8ff); color:#fff; box-shadow:0 0 18px rgba(255,43,214,.35)}
+    .btn-gold{background:linear-gradient(90deg,#ffd44a,#ffb200); color:#2f1400}
+    .btn-green{background:linear-gradient(90deg,#1ed760,#96ffb7); color:#032810}
+    .btn-red{background:#ff4166;color:#fff}
+    .toolbar{display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 0}
+    .status{
+      margin-top:10px;
+      min-height:28px;
+      font-weight:800;
+      color:#fff0bc;
+    }
+    .question-box{
+      margin-top:14px;
+      padding:18px;
+      border-radius:18px;
+      background:linear-gradient(180deg,#1c0d2f,#0d0717);
+      border:1px solid rgba(255,215,0,.35);
+      box-shadow:0 0 28px rgba(255,215,0,.08);
+    }
+    .pill{
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      background:#ffd44a;
+      color:#281100;
+      font-weight:900;
+      font-size:12px;
+    }
+    .q-text{font-size:22px;line-height:1.4;margin:12px 0 14px;font-weight:900}
+    .options{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .option{background:#26153f;color:#fff;border:1px solid rgba(255,255,255,.16)}
+    .option.correct{background:#116c34}
+    .option.wrong{background:#92223c}
+    .feedback{margin-top:12px;font-size:19px;font-weight:900;min-height:24px}
+    .back-btn{margin-bottom:10px}
+    .small{font-size:13px; color:#d7ccf8; line-height:1.55}
+    .center{text-align:center}
+    .big{
+      font-size:clamp(28px,5vw,58px);
+      font-weight:900;
+      color:#ffd44a;
+      text-shadow:0 0 14px rgba(255,215,0,.5);
+    }
+
+    /* specific game visuals */
+    .wheel-wrap{position:relative;width:min(480px,90vw);aspect-ratio:1;margin:10px auto}
+    #wheelCanvas{
+      width:100%;height:100%;border-radius:50%;
+      box-shadow:0 0 30px rgba(255,215,0,.18);
+      transition:transform 5s cubic-bezier(.1,.75,.15,1);
+      background:#19092b;
+    }
+    .pointer{
+      position:absolute;left:50%;top:-6px;transform:translateX(-50%);
+      width:0;height:0;border-left:22px solid transparent;border-right:22px solid transparent;border-top:40px solid #ffd44a;
+      filter:drop-shadow(0 0 10px #ffb200);
+    }
+    .wheel-center{
+      position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+      width:100px;height:100px;border-radius:50%;
+      background:radial-gradient(circle at 35% 25%,#fffbd2,#ffd54a 45%,#c86b00 75%);
+      border:6px solid #fff4a8;
+      display:grid;place-items:center;
+      text-align:center;font-weight:900;color:#361700;
+      box-shadow:0 0 22px #ffd54a,inset 0 0 18px #8e4500;
+      z-index:5;
+      font-size:12px;
+    }
+
+    .dice-scene{
+      height:330px;display:flex;justify-content:center;align-items:center;perspective:900px; position:relative;
+      background:radial-gradient(circle, rgba(255,255,255,.05), transparent 60%);
+      border-radius:16px;
+    }
+    .shadow{
+      position:absolute;bottom:50px;width:120px;height:28px;background:rgba(0,0,0,.45);border-radius:50%;filter:blur(10px);
+    }
+    .dice-wrapper{width:120px;height:120px;position:relative;transform-style:preserve-3d}
+    .dice{width:120px;height:120px;position:relative;transform-style:preserve-3d;transition:transform 1.8s cubic-bezier(.17,.67,.24,1.25)}
+    .face{position:absolute;width:120px;height:120px;background:linear-gradient(145deg,#fff,#ececec);border:4px solid #d1d1d1;border-radius:18px;box-shadow:inset 0 0 20px rgba(0,0,0,.12)}
+    .front{transform:rotateY(0deg) translateZ(60px)} .back{transform:rotateY(180deg) translateZ(60px)}
+    .right{transform:rotateY(90deg) translateZ(60px)} .left{transform:rotateY(-90deg) translateZ(60px)}
+    .topf{transform:rotateX(90deg) translateZ(60px)} .bottomf{transform:rotateX(-90deg) translateZ(60px)}
+    .dot{width:18px;height:18px;background:#111;border-radius:50%;position:absolute}
+    .center-dot{top:50%;left:50%;transform:translate(-50%,-50%)}
+    .tl{top:18px;left:18px}.tr{top:18px;right:18px}.ml{top:50%;left:18px;transform:translateY(-50%)}.mr{top:50%;right:18px;transform:translateY(-50%)}.bl{bottom:18px;left:18px}.br{bottom:18px;right:18px}
+
+    .slot-machine{
+      display:grid;grid-template-columns:repeat(3,120px);gap:14px;justify-content:center;margin:20px 0;
+    }
+    .slot{
+      height:120px;border-radius:18px;background:linear-gradient(180deg,#2d1140,#12081f);
+      border:2px solid rgba(255,215,0,.25);
+      display:grid;place-items:center;font-size:56px;font-weight:900;
+      box-shadow:inset 0 0 24px rgba(255,255,255,.05), 0 0 24px rgba(0,0,0,.25);
+    }
+
+    .cards-grid{
+      display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px;
+    }
+    .pick-card{
+      min-height:120px;border-radius:16px;
+      background:linear-gradient(135deg,#ff2bd6,#6b46ff,#00d8ff);
+      display:flex;justify-content:center;align-items:center;
+      font-size:38px;font-weight:900; cursor:pointer;
+      border:2px solid rgba(255,255,255,.18);
+      box-shadow:0 0 18px rgba(255,43,214,.20);
+      transition:.2s;
+    }
+    .pick-card:hover{transform:translateY(-4px)}
+    .pick-card.open{background:linear-gradient(135deg,#ffd44a,#ff9f1a); color:#341800}
+
+    .memory-grid{
+      display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px
+    }
+    .memory-card{
+      aspect-ratio:1;border-radius:14px;background:linear-gradient(135deg,#7238ff,#ff2bd6);
+      display:grid;place-items:center;font-size:30px;font-weight:900;cursor:pointer; user-select:none;
+      border:2px solid rgba(255,255,255,.16)
+    }
+    .memory-card.revealed,.memory-card.matched{background:linear-gradient(135deg,#ffd44a,#ff9f1a);color:#2b1300}
+    .tf-buttons,.coin-buttons{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:14px}
+    .roulette-display,.coin-display,.jackpot-display{
+      margin:18px auto; width:min(420px,100%); min-height:160px;
+      display:grid; place-items:center; border-radius:18px;
+      background:linear-gradient(180deg,#220c35,#100818);
+      border:2px solid rgba(255,215,0,.25);
+      font-size:30px; font-weight:900; text-align:center; padding:20px;
+    }
+    .coin{
+      width:120px;height:120px;border-radius:50%;
+      background:radial-gradient(circle at 30% 25%,#fffbd0,#ffd54a 45%,#ff9f00 72%);
+      border:5px solid #fff3a3; display:grid; place-items:center;
+      color:#6a3500; font-size:32px; font-weight:900;
+      box-shadow:0 0 18px rgba(255,215,0,.5);
+      margin:auto;
+      transition:transform 1s;
+    }
+    .boxes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+    .lucky-box{
+      min-height:130px;border-radius:16px;
+      background:linear-gradient(135deg,#00d8ff,#6b46ff,#ff2bd6);
+      display:flex;justify-content:center;align-items:center;
+      text-align:center;padding:10px;
+      font-size:20px;font-weight:900;cursor:pointer;
+      border:2px solid rgba(255,255,255,.18)
+    }
+    .lucky-box.open{background:linear-gradient(135deg,#ffd44a,#ff9f1a);color:#2f1300}
+    .jackpot-number{
+      font-size:72px; color:#ffd44a; text-shadow:0 0 20px rgba(255,215,0,.45)
+    }
+    .note{margin-top:10px;color:#cfc3f1;font-size:12px;line-height:1.5}
+
+
+    .bank-launch{
+      margin-bottom:18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      border:1px solid rgba(255,215,0,.35);
+      background:linear-gradient(90deg,rgba(255,215,0,.12),rgba(255,43,214,.10),rgba(0,216,255,.10));
+    }
+    .bank-launch h3{margin:0 0 5px;color:#ffe477;font-size:22px}
+    .bank-launch p{margin:0;color:#e9e0ff;line-height:1.4}
+    .bank-panel{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:18px;
+      margin-top:12px;
+    }
+    .upload-zone{
+      border:2px dashed rgba(255,215,0,.45);
+      border-radius:18px;
+      padding:24px;
+      text-align:center;
+      background:rgba(255,215,0,.05);
+      transition:.2s;
+    }
+    .upload-zone.drag{background:rgba(0,216,255,.10);border-color:#00d8ff}
+    .upload-zone input[type=file]{display:none}
+    .upload-title{font-size:24px;font-weight:900;color:#ffe477;margin-bottom:8px}
+    .upload-help{font-size:13px;color:#d8cdf8;line-height:1.55}
+    .bank-summary{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+      margin:12px 0;
+    }
+    .mini-stat{
+      background:#13091f;border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px;text-align:center;
+    }
+    .mini-stat strong{display:block;font-size:26px;color:#ffd44a;margin-top:3px}
+    .bank-list{
+      max-height:330px;overflow:auto;background:#0d0715;border-radius:14px;padding:10px;border:1px solid rgba(255,255,255,.08);
+    }
+    .bank-row{
+      display:flex;justify-content:space-between;gap:12px;padding:10px;border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .bank-row:last-child{border:0}
+    .bank-row b{color:#fff2a8}
+    .format-box{
+      background:#0c0713;border-radius:14px;padding:14px;white-space:pre-wrap;font-family:Consolas,monospace;
+      color:#dcf9ff;border:1px solid rgba(0,216,255,.22);font-size:12px;line-height:1.55;
+    }
+    textarea.bulk{
+      min-height:220px;width:100%;resize:vertical;background:#0d0715;color:#fff;border:1px solid rgba(255,255,255,.16);
+      border-radius:14px;padding:12px;font-family:Consolas,monospace;
+    }
+    select.bank-select{
+      width:100%;padding:12px;border-radius:12px;background:#160c25;color:#fff;border:1px solid rgba(255,255,255,.16);
+    }
+    .bank-status{margin-top:10px;min-height:26px;font-weight:800;color:#fff0a8}
+
+    @media(max-width:1024px){
+      .menu-grid{grid-template-columns:repeat(2,1fr)}
+      .bank-panel{grid-template-columns:1fr}
+      .play-area{grid-template-columns:1fr}
+      .topbar{grid-template-columns:repeat(2,1fr)}
+      .cards-grid,.boxes-grid{grid-template-columns:repeat(2,1fr)}
+    }
+    @media(max-width:620px){
+      .menu-grid,.topbar,.cards-grid,.boxes-grid,.memory-grid,.options{grid-template-columns:1fr}
+      .slot-machine{grid-template-columns:repeat(3,90px)}
+      .slot{height:90px;font-size:42px}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="title">🎰 JOGOS DO CONHECIMENTO</div>
+    <div class="subtitle">Plataforma com 8 jogos educativos em estilo cassino</div>
+
+    <div class="topbar">
+      <div class="card"><div class="stat-title">Fichas</div><div class="stat-value">🪙 <span id="chips">100</span></div></div>
+      <div class="card"><div class="stat-title">Pontos</div><div class="stat-value">⭐ <span id="points">0</span></div></div>
+      <div class="card"><div class="stat-title">Acertos</div><div class="stat-value">✅ <span id="hits">0</span></div></div>
+      <div class="card"><div class="stat-title">Jogos Jogados</div><div class="stat-value">🎮 <span id="plays">0</span></div></div>
+    </div>
+
+    <div class="bank-launch card">
+      <div>
+        <h3>📚 Banco de Questões da Plataforma</h3>
+        <p>Importe um arquivo Word com várias questões. O mesmo banco alimenta automaticamente os 8 jogos.</p>
+      </div>
+      <button class="btn btn-gold" onclick="openGame('bankScreen')">📥 IMPORTAR / GERENCIAR QUESTÕES</button>
+    </div>
+
+    <section id="bankScreen" class="screen">
+      <button class="btn btn-gold back-btn" onclick="goHome()">⬅ Voltar ao Cassino</button>
+      <div class="card">
+        <h2 style="margin:0;color:#ffe477">📚 Banco de Questões</h2>
+        <p class="small">Use um arquivo <b>.DOCX do Word</b>, TXT, MD ou JSON. Você pode substituir o banco inteiro ou acrescentar novas questões.</p>
+
+        <div class="bank-summary">
+          <div class="mini-stat">Questões<strong id="bankTotal">0</strong></div>
+          <div class="mini-stat">Áreas<strong id="bankAreas">0</strong></div>
+          <div class="mini-stat">Status<strong id="bankSaved">OK</strong></div>
+        </div>
+
+        <div class="bank-panel">
+          <div>
+            <div class="upload-zone" id="uploadZone">
+              <div class="upload-title">📄 Arraste o Word aqui</div>
+              <div class="upload-help">ou clique no botão abaixo para escolher o arquivo com todas as questões.</div>
+              <label class="btn btn-primary" for="questionFile" style="display:inline-block;margin-top:14px">Escolher arquivo</label>
+              <input id="questionFile" type="file" accept=".docx,.txt,.md,.json">
+            </div>
+
+            <div style="margin-top:12px">
+              <label class="small"><b>Modo de importação</b></label>
+              <select id="importMode" class="bank-select">
+                <option value="replace">Substituir as questões atuais pelo arquivo</option>
+                <option value="append">Adicionar às questões que já existem</option>
+              </select>
+            </div>
+
+            <div class="toolbar">
+              <button class="btn btn-green" onclick="restoreDefaultBank()">↩ Restaurar questões padrão</button>
+              <button class="btn btn-red" onclick="clearQuestionBank()">🗑 Limpar banco</button>
+            </div>
+            <div id="bankStatus" class="bank-status">Pronto para receber seu arquivo.</div>
+
+            <h3 style="margin:20px 0 8px">✍️ Ou cole várias questões</h3>
+            <textarea class="bulk" id="bulkText" placeholder="[MATEMÁTICA]
+
+Pergunta: Quanto é 7 × 8?
+A) 48
+B) 54
+C) 56
+D) 64
+Resposta: C"></textarea>
+            <div class="toolbar">
+              <button class="btn btn-primary" onclick="importPastedQuestions()">Importar texto colado</button>
+            </div>
+          </div>
+
+          <div>
+            <h3 style="margin-top:0">Formato do arquivo Word</h3>
+            <div class="format-box">[MATEMÁTICA]
+
+Pergunta: Quanto é 7 × 8?
+A) 48
+B) 54
+C) 56
+D) 64
+Resposta: C
+
+[CIÊNCIAS]
+
+Pergunta: Qual planeta é conhecido como planeta vermelho?
+A) Terra
+B) Marte
+C) Vênus
+D) Júpiter
+Resposta: B</div>
+
+            <h3 style="margin:18px 0 8px">Questões carregadas por área</h3>
+            <div class="bank-list" id="bankList"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="homeScreen" class="screen active">
+      <div class="menu-grid">
+        <div class="card game-card" onclick="openGame('wheelGame')">
+          <span class="tag">Jogo 1</span>
+          <h3>🎡 Roleta do Saber</h3>
+          <p>Gire a roleta, sorteie uma área e responda à questão para ganhar fichas e pontos.</p>
+        </div>
+        <div class="card game-card" onclick="openGame('diceGame')">
+          <span class="tag">Jogo 2</span>
+          <h3>🎲 Dado 3D</h3>
+          <p>Jogue o dado 3D girando no ar. O número define a questão sorteada.</p>
+        </div>
+        <div class="card game-card" onclick="openGame('slotGame')">
+          <span class="tag">Jogo 3</span>
+          <h3>🎰 Caça-Níquel Quiz</h3>
+          <p>Gire os rolos do caça-níquel. Se houver combinação, uma pergunta premiada aparece.</p>
+        </div>
+        <div class="card game-card" onclick="openGame('cardGame')">
+          <span class="tag">Jogo 4</span>
+          <h3>🃏 Carta Premiada</h3>
+          <p>Escolha uma carta surpresa e responda à questão escondida para dobrar a recompensa.</p>
+        </div>
+        <div class="card game-card" onclick="openGame('memoryGame')">
+          <span class="tag">Jogo 5</span>
+          <h3>💎 Memória Neon</h3>
+          <p>Encontre pares em um jogo de memória com visual de cassino brilhante.</p>
+        </div>
+        <div class="card game-card" onclick="openGame('rouletteGame')">
+          <span class="tag">Jogo 6</span>
+          <h3>🎯 Roleta Verdadeiro/Falso</h3>
+          <p>Receba uma afirmação e aposte em verdadeiro ou falso.</p>
+        </div>
+        <div class="card game-card" onclick="openGame('coinGame')">
+          <span class="tag">Jogo 7</span>
+          <h3>🪙 Cara ou Coroa Quiz</h3>
+          <p>Lance a moeda dourada. O lado sorteado libera uma pergunta temática.</p>
+        </div>
+        <div class="card game-card" onclick="openGame('boxGame')">
+          <span class="tag">Jogo 8</span>
+          <h3>📦 Caixa da Sorte</h3>
+          <p>Escolha uma caixa. Dentro dela há categoria, prêmio e desafio surpresa.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- template-like layout for games -->
+    <section id="wheelGame" class="screen">
+      <button class="btn btn-gold back-btn" onclick="goHome()">⬅ Voltar ao Cassino</button>
+      <div class="play-area">
+        <div class="side card">
+          <h2>🎡 Roleta do Saber</h2>
+          <div class="small">Gire a roleta. A área sorteada define a pergunta. Cada acerto vale <b>15 fichas</b> e <b>10 pontos</b>.</div>
+          <div class="toolbar">
+            <button class="btn btn-primary" onclick="spinWheelGame()">Girar Roleta</button>
+            <button class="btn btn-red" onclick="resetQuestionBox()">Limpar Questão</button>
+          </div>
+          <div class="status" id="wheelStatus">Clique em girar para começar.</div>
+        </div>
+        <div class="main card">
+          <div class="wheel-wrap">
+            <div class="pointer"></div>
+            <canvas id="wheelCanvas" width="700" height="700"></canvas>
+            <div class="wheel-center">RODA DO<br> SABER</div>
+          </div>
+          <div id="wheelQuestion" class="question-box" style="display:none"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="diceGame" class="screen">
+      <button class="btn btn-gold back-btn" onclick="goHome()">⬅ Voltar ao Cassino</button>
+      <div class="play-area">
+        <div class="side card">
+          <h2>🎲 Dado 3D</h2>
+          <div class="small">Jogue o dado para o alto. Ao cair, o número define uma área do conhecimento e uma pergunta.</div>
+          <div class="toolbar">
+            <button class="btn btn-primary" onclick="rollDiceGame()">Jogar Dado</button>
+          </div>
+          <div class="status" id="diceStatus">Prepare-se para lançar o dado.</div>
+        </div>
+        <div class="main card">
+          <div class="dice-scene">
+            <div class="shadow" id="diceShadow"></div>
+            <div class="dice-wrapper" id="diceWrapper">
+              <div class="dice" id="dice">
+                <div class="face front"><div class="dot center-dot"></div></div>
+                <div class="face back"><div class="dot tl"></div><div class="dot tr"></div><div class="dot center-dot"></div><div class="dot bl"></div><div class="dot br"></div></div>
+                <div class="face right"><div class="dot tl"></div><div class="dot center-dot"></div><div class="dot br"></div></div>
+                <div class="face left"><div class="dot tl"></div><div class="dot tr"></div><div class="dot bl"></div><div class="dot br"></div></div>
+                <div class="face topf"><div class="dot tl"></div><div class="dot tr"></div><div class="dot ml"></div><div class="dot mr"></div><div class="dot bl"></div><div class="dot br"></div></div>
+                <div class="face bottomf"><div class="dot tl"></div><div class="dot br"></div></div>
+              </div>
+            </div>
+          </div>
+          <div id="diceQuestion" class="question-box" style="display:none"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="slotGame" class="screen">
+      <button class="btn btn-gold back-btn" onclick="goHome()">⬅ Voltar ao Cassino</button>
+      <div class="play-area">
+        <div class="side card">
+          <h2>🎰 Caça-Níquel Quiz</h2>
+          <div class="small">Gire os rolos. Se aparecer pelo menos um par igual, você desbloqueia uma pergunta premiada.</div>
+          <div class="toolbar">
+            <button class="btn btn-primary" onclick="spinSlots()">Girar Caça-Níquel</button>
+          </div>
+          <div class="status" id="slotStatus">Boa sorte!</div>
+        </div>
+        <div class="main card center">
+          <div class="slot-machine">
+            <div class="slot" id="slot1">🍀</div>
+            <div class="slot" id="slot2">⭐</div>
+            <div class="slot" id="slot3">💎</div>
+          </div>
+          <div id="slotQuestion" class="question-box" style="display:none;text-align:left"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="cardGame" class="screen">
+      <button class="btn btn-gold back-btn" onclick="goHome()">⬅ Voltar ao Cassino</button>
+      <div class="play-area">
+        <div class="side card">
+          <h2>🃏 Carta Premiada</h2>
+          <div class="small">Escolha uma carta. Cada uma revela uma categoria e uma pergunta surpresa.</div>
+          <div class="toolbar">
+            <button class="btn btn-primary" onclick="setupCardGame()">Nova Rodada</button>
+          </div>
+          <div class="status" id="cardStatus">Escolha uma carta para revelar.</div>
+        </div>
+        <div class="main card">
+          <div class="cards-grid" id="cardsGrid"></div>
+          <div id="cardQuestion" class="question-box" style="display:none"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="memoryGame" class="screen">
+      <button class="btn btn-gold back-btn" onclick="goHome()">⬅ Voltar ao Cassino</button>
+      <div class="play-area">
+        <div class="side card">
+          <h2>💎 Memória Neon</h2>
+          <div class="small">Encontre todos os pares. Cada par encontrado vale fichas e pontos.</div>
+          <div class="toolbar">
+            <button class="btn btn-primary" onclick="startMemoryGame()">Embaralhar</button>
+          </div>
+          <div class="status" id="memoryStatus">Encontre os pares.</div>
+        </div>
+        <div class="main card">
+          <div class="memory-grid" id="memoryGrid"></div>
+          <div id="memoryQuestion" class="question-box" style="display:none"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="rouletteGame" class="screen">
+      <button class="btn btn-gold back-btn" onclick="goHome()">⬅ Voltar ao Cassino</button>
+      <div class="play-area">
+        <div class="side card">
+          <h2>🎯 Verdadeiro ou Falso</h2>
+          <div class="small">Leia a afirmação e responda se ela é verdadeira ou falsa.</div>
+          <div class="toolbar">
+            <button class="btn btn-primary" onclick="newTF()">Nova Afirmação</button>
+          </div>
+          <div class="status" id="tfStatus">Clique em nova afirmação.</div>
+        </div>
+        <div class="main card center">
+          <div class="roulette-display" id="tfStatement">Pressione o botão para receber uma afirmação.</div>
+          <div class="tf-buttons">
+            <button class="btn btn-green" onclick="answerTF(true)">Verdadeiro</button>
+            <button class="btn btn-red" onclick="answerTF(false)">Falso</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="coinGame" class="screen">
+      <button class="btn btn-gold back-btn" onclick="goHome()">⬅ Voltar ao Cassino</button>
+      <div class="play-area">
+        <div class="side card">
+          <h2>🪙 Cara ou Coroa Quiz</h2>
+          <div class="small">Lance a moeda. O lado sorteado define o conjunto de perguntas.</div>
+          <div class="toolbar">
+            <button class="btn btn-primary" onclick="flipCoinGame()">Lançar Moeda</button>
+          </div>
+          <div class="status" id="coinStatus">Pronto para lançar a moeda.</div>
+        </div>
+        <div class="main card center">
+          <div class="coin" id="coin">?</div>
+          <div id="coinQuestion" class="question-box" style="display:none;text-align:left"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="boxGame" class="screen">
+      <button class="btn btn-gold back-btn" onclick="goHome()">⬅ Voltar ao Cassino</button>
+      <div class="play-area">
+        <div class="side card">
+          <h2>📦 Caixa da Sorte</h2>
+          <div class="small">Escolha uma caixa colorida. Cada caixa revela uma categoria e um desafio premiado.</div>
+          <div class="toolbar">
+            <button class="btn btn-primary" onclick="setupBoxes()">Nova Rodada</button>
+          </div>
+          <div class="status" id="boxStatus">Escolha uma caixa da sorte.</div>
+        </div>
+        <div class="main card">
+          <div class="boxes-grid" id="boxesGrid"></div>
+          <div id="boxQuestion" class="question-box" style="display:none"></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="note">Plataforma educativa em estilo cassino. Sem apostas reais. Você pode depois adaptar as questões, categorias e pontuações.</div>
+  </div>
+
+<script>
+/* GLOBAL STATE */
+let chips=100, points=0, hits=0, plays=0;
+let currentTF = null;
+const screens = ["homeScreen","bankScreen","wheelGame","diceGame","slotGame","cardGame","memoryGame","rouletteGame","coinGame","boxGame"];
+
+let areas = ["Matemática","Português","Ciências","História","Geografia","Tecnologia"];
+const colors = ["#ff2bd6","#7b4dff","#00d9ff","#00f08a","#ffd23f","#ff6a00"];
+
+/* QUESTION BANK */
+const questionBank = {
+  "Matemática":[
+    q("Matemática","Quanto é 12 × 7?",["72","84","96","78"],1),
+    q("Matemática","Qual é 25% de 200?",["25","50","75","100"],1),
+    q("Matemática","Quanto é 9²?",["18","72","81","99"],2)
+  ],
+  "Português":[
+    q("Português","Qual alternativa apresenta um substantivo?",["Bonito","Correr","Escola","Rapidamente"],2),
+    q("Português","Na frase 'Os alunos estudam', o verbo é:",["Os","alunos","estudam","nenhum"],2),
+    q("Português","Qual palavra está no plural?",["Casa","Lápis","Livros","Caderno"],2)
+  ],
+  "Ciências":[
+    q("Ciências","Qual planeta é conhecido como planeta vermelho?",["Vênus","Marte","Saturno","Mercúrio"],1),
+    q("Ciências","A água entra em ebulição em:",["70°C","80°C","100°C","120°C"],2),
+    q("Ciências","Qual órgão bombeia o sangue?",["Fígado","Pulmão","Coração","Rim"],2)
+  ],
+  "História":[
+    q("História","A Independência do Brasil ocorreu em:",["1500","1822","1889","1930"],1),
+    q("História","Quem foi o primeiro imperador do Brasil?",["Dom Pedro I","Getúlio Vargas","Dom Pedro II","Tiradentes"],0),
+    q("História","A Proclamação da República ocorreu em:",["1822","1889","1922","1932"],1)
+  ],
+  "Geografia":[
+    q("Geografia","Qual é a capital do Brasil?",["São Paulo","Salvador","Brasília","Rio de Janeiro"],2),
+    q("Geografia","Qual é o maior oceano?",["Atlântico","Índico","Pacífico","Ártico"],2),
+    q("Geografia","O Brasil fica em qual continente?",["Europa","África","Ásia","América do Sul"],3)
+  ],
+  "Tecnologia":[
+    q("Tecnologia","HTML é usado para:",["Criar estrutura de páginas web","Editar vídeos","Montar circuitos","Criar antivírus"],0),
+    q("Tecnologia","Qual linguagem estiliza páginas web?",["Python","Java","CSS","C++"],2),
+    q("Tecnologia","JavaScript é usado principalmente para:",["Interatividade nas páginas","Formatar texto","Fazer planilhas","Imprimir"],0)
+  ]
+};
+
+const defaultQuestionBank = JSON.parse(JSON.stringify(questionBank));
+
+const tfBank = [
+  {text:"Brasília é a capital do Brasil.", answer:true},
+  {text:"CSS é uma linguagem de banco de dados.", answer:false},
+  {text:"O coração bombeia o sangue pelo corpo.", answer:true},
+  {text:"A Proclamação da República no Brasil ocorreu em 1822.", answer:false},
+  {text:"Marte é conhecido como planeta vermelho.", answer:true},
+  {text:"HTML serve para estruturar páginas web.", answer:true}
+];
+
+const coinSets = {
+  "CARA":[
+    q("Desafio Cara","Quanto é 5 × 9?",["35","45","55","50"],1),
+    q("Desafio Cara","Qual é a capital da França?",["Lisboa","Paris","Roma","Madri"],1)
+  ],
+  "COROA":[
+    q("Desafio Coroa","Qual elemento as plantas absorvem para fotossíntese?",["Oxigênio","Nitrogênio","Gás carbônico","Hélio"],2),
+    q("Desafio Coroa","Qual linguagem deixa uma página bonita?",["CSS","SQL","Excel","PDF"],0)
+  ]
+};
+
+function q(area, question, options, correct){ return {area, question, options, correct}; }
+function rand(arr){
+  if(!arr || !arr.length) return null;
+  return arr[Math.floor(Math.random()*arr.length)];
+}
+function randomQuestion(area){
+  const list = questionBank[area] || [];
+  if(list.length) return rand(list);
+  const all = Object.values(questionBank).flat();
+  return all.length ? rand(all) : q("Geral","Nenhuma questão foi carregada.",["Voltar ao banco","Voltar ao banco","Voltar ao banco","Voltar ao banco"],0);
+}
+
+/* UI helpers */
+function updateStats(){
+  document.getElementById("chips").textContent = chips;
+  document.getElementById("points").textContent = points;
+  document.getElementById("hits").textContent = hits;
+  document.getElementById("plays").textContent = plays;
+}
+function reward(chipGain, pointGain){
+  chips += chipGain;
+  points += pointGain;
+  hits += 1;
+  updateStats();
+}
+function registerPlay(){ plays += 1; updateStats(); }
+function openGame(id){
+  screens.forEach(s=>document.getElementById(s).classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  if(id==="bankScreen") renderBankSummary();
+}
+function goHome(){
+  screens.forEach(s=>document.getElementById(s).classList.remove("active"));
+  document.getElementById("homeScreen").classList.add("active");
+}
+function resetQuestionBox(){
+  const targets=["wheelQuestion","diceQuestion","slotQuestion","cardQuestion","coinQuestion","boxQuestion"];
+  targets.forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display="none"; });
+}
+function renderQuestion(targetId, data, chipGain=15, pointGain=10){
+  const el = document.getElementById(targetId);
+  el.style.display = "block";
+  el.innerHTML = `
+    <span class="pill">${data.area}</span>
+    <div class="q-text">${data.question}</div>
+    <div class="options">
+      ${data.options.map((op,i)=>`<button class="btn option" onclick="answerQuestion('${targetId}', this, ${i}, ${data.correct}, ${chipGain}, ${pointGain})"><b>${String.fromCharCode(65+i)})</b> ${op}</button>`).join("")}
+    </div>
+    <div class="feedback"></div>
+  `;
+}
+function answerQuestion(targetId, btn, selected, correct, chipGain, pointGain){
+  const wrap = document.getElementById(targetId);
+  const buttons = [...wrap.querySelectorAll(".option")];
+  const feedback = wrap.querySelector(".feedback");
+  buttons.forEach(b=>b.disabled=true);
+  if(selected===correct){
+    btn.classList.add("correct");
+    feedback.innerHTML = `✅ Correto! +${chipGain} fichas e +${pointGain} pontos`;
+    reward(chipGain, pointGain);
+  }else{
+    btn.classList.add("wrong");
+    if(buttons[correct]) buttons[correct].classList.add("correct");
+    feedback.innerHTML = `❌ Errou! A resposta correta era ${String.fromCharCode(65+correct)}.`;
+  }
+}
+function sound(type){
+  try{
+    const ac = new (window.AudioContext || window.webkitAudioContext)();
+    const now = ac.currentTime;
+    const tones = {
+      spin:[220,280,340],
+      win:[523.25,659.25,783.99,1046.5],
+      wrong:[180,120],
+      click:[440,660],
+      soft:[360,490]
+    }[type] || [440];
+    tones.forEach((f,i)=>{
+      const o=ac.createOscillator(), g=ac.createGain();
+      o.type = type==="wrong" ? "sawtooth" : "sine";
+      o.frequency.setValueAtTime(f, now+i*0.08);
+      g.gain.setValueAtTime(0.0001, now+i*0.08);
+      g.gain.exponentialRampToValueAtTime(0.10, now+i*0.08+0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, now+i*0.08+0.18);
+      o.connect(g); g.connect(ac.destination);
+      o.start(now+i*0.08); o.stop(now+i*0.08+0.2);
+    });
+  }catch(e){}
+}
+
+/* Game 1: Wheel */
+const wheelCanvas = document.getElementById("wheelCanvas");
+const wctx = wheelCanvas.getContext("2d");
+let wheelRotation = 0;
+drawWheel();
+function drawWheel(){
+  const cx=350, cy=350, r=290, n=areas.length;
+  wctx.clearRect(0,0,700,700);
+  for(let i=0;i<n;i++){
+    const start=-Math.PI/2 + i*2*Math.PI/n;
+    const end=start+2*Math.PI/n;
+    wctx.beginPath(); wctx.moveTo(cx,cy); wctx.arc(cx,cy,r,start,end); wctx.closePath();
+    const grad=wctx.createRadialGradient(cx,cy,60,cx,cy,r);
+    grad.addColorStop(0, shade(colors[i], 20));
+    grad.addColorStop(.75, colors[i]);
+    grad.addColorStop(1, shade(colors[i], -35));
+    wctx.fillStyle=grad;
+    wctx.fill();
+    wctx.lineWidth=4;
+    wctx.strokeStyle="#ffeaa7";
+    wctx.stroke();
+    wctx.save();
+    wctx.translate(cx,cy);
+    wctx.rotate(start + Math.PI/n);
+    wctx.textAlign="right";
+    wctx.fillStyle="#fff";
+    wctx.font="bold 28px Arial";
+    wctx.fillText(areas[i].toUpperCase(), r-35, 10);
+    wctx.restore();
+  }
+}
+function shade(hex, percent){
+  let f=parseInt(hex.slice(1),16),t=percent<0?0:255,p=Math.abs(percent)/100;
+  let R=f>>16,G=f>>8&0x00FF,B=f&0x0000FF;
+  return "#"+(0x1000000+
+    (Math.round((t-R)*p)+R)*0x10000+
+    (Math.round((t-G)*p)+G)*0x100+
+    (Math.round((t-B)*p)+B)).toString(16).slice(1);
+}
+function spinWheelGame(){
+  registerPlay();
+  sound("spin");
+  document.getElementById("wheelStatus").textContent="🎡 Girando a roleta...";
+  const idx=Math.floor(Math.random()*areas.length);
+  const slice=360/areas.length;
+  const centerAngle=idx*slice + slice/2;
+  const desiredFinal=(360-centerAngle)%360;
+  const currentMod=((wheelRotation%360)+360)%360;
+  const correction=(desiredFinal-currentMod+360)%360;
+  wheelRotation += (5+Math.floor(Math.random()*2))*360 + correction;
+  wheelCanvas.style.transform = `rotate(${wheelRotation}deg)`;
+  setTimeout(()=>{
+    const area=areas[idx];
+    document.getElementById("wheelStatus").textContent=`Área sorteada: ${area}`;
+    renderQuestion("wheelQuestion", randomQuestion(area), 15, 10);
+    sound("soft");
+  },5100);
+}
+
+/* Game 2: Dice */
+const dice = document.getElementById("dice");
+const diceWrapper = document.getElementById("diceWrapper");
+const diceShadow = document.getElementById("diceShadow");
+const orientations={
+  1:"rotateX(0deg) rotateY(0deg)",
+  2:"rotateX(-90deg) rotateY(0deg)",
+  3:"rotateY(-90deg)",
+  4:"rotateY(90deg)",
+  5:"rotateX(90deg)",
+  6:"rotateY(180deg)"
+};
+function rollDiceGame(){
+  registerPlay();
+  sound("spin");
+  document.getElementById("diceStatus").textContent="🎲 Lançando o dado...";
+  const num=Math.floor(Math.random()*6)+1;
+  diceWrapper.animate([{transform:"translateY(0px)"},{transform:"translateY(-160px)"},{transform:"translateY(0px)"}],{duration:1800,easing:"ease-in-out"});
+  diceShadow.animate([{transform:"scale(1)",opacity:0.45},{transform:"scale(0.6)",opacity:0.18},{transform:"scale(1)",opacity:0.45}],{duration:1800,easing:"ease-in-out"});
+  const gx=720+Math.floor(Math.random()*720), gy=720+Math.floor(Math.random()*720);
+  dice.style.transform=`rotateX(${gx}deg) rotateY(${gy}deg)`;
+  setTimeout(()=>{
+    dice.style.transition="transform .8s ease-out";
+    dice.style.transform=orientations[num];
+    setTimeout(()=>{
+      const area=areas[(num-1)%areas.length];
+      document.getElementById("diceStatus").textContent=`O dado caiu em ${num} → ${area}`;
+      renderQuestion("diceQuestion", randomQuestion(area), 18, 12);
+      sound("soft");
+    },850);
+  },1800);
+}
+
+/* Game 3: Slot */
+const slotIcons=["🍀","⭐","💎","7","🪙","🎓"];
+function spinSlots(){
+  registerPlay();
+  sound("spin");
+  document.getElementById("slotQuestion").style.display="none";
+  document.getElementById("slotStatus").textContent="🎰 Girando os rolos...";
+  const els=[document.getElementById("slot1"),document.getElementById("slot2"),document.getElementById("slot3")];
+  let count=0;
+  const anim=setInterval(()=>{
+    els.forEach(el=>el.textContent=rand(slotIcons));
+    count++;
+    if(count>18){
+      clearInterval(anim);
+      const final=[rand(slotIcons),rand(slotIcons),rand(slotIcons)];
+      els.forEach((el,i)=>el.textContent=final[i]);
+      const pair = (final[0]===final[1] || final[0]===final[2] || final[1]===final[2]);
+      if(pair){
+        const area=rand(areas);
+        document.getElementById("slotStatus").textContent="Parabéns! Combinação premiada. Responda para ganhar mais.";
+        renderQuestion("slotQuestion", randomQuestion(area), 20, 15);
+        sound("win");
+      }else{
+        document.getElementById("slotStatus").textContent="Sem combinação desta vez. Gire novamente!";
+        sound("wrong");
+      }
+    }
+  },90);
+}
+
+/* Game 4: Cards */
+function setupCardGame(){
+  const grid=document.getElementById("cardsGrid");
+  grid.innerHTML="";
+  document.getElementById("cardQuestion").style.display="none";
+  document.getElementById("cardStatus").textContent="Escolha uma carta para revelar.";
+  for(let i=1;i<=8;i++){
+    const div=document.createElement("div");
+    div.className="pick-card";
+    div.textContent="🂠";
+    div.onclick=()=>openPickCard(div,i);
+    grid.appendChild(div);
+  }
+}
+function openPickCard(div,i){
+  if(div.classList.contains("open")) return;
+  [...document.querySelectorAll(".pick-card")].forEach(c=>c.style.pointerEvents="none");
+  div.classList.add("open");
+  const area=areas[(i-1)%areas.length];
+  div.textContent=area[0];
+  document.getElementById("cardStatus").textContent=`Carta ${i} revelou ${area}.`;
+  renderQuestion("cardQuestion", randomQuestion(area), 22, 15);
+  sound("click");
+}
+
+/* Game 5: Memory */
+let memoryValues=[], memoryFirst=null, memoryLock=false, matchedCount=0;
+function startMemoryGame(){
+  registerPlay();
+  const symbols=["🍀","🍀","⭐","⭐","💎","💎","🪙","🪙","🎓","🎓","7","7","🃏","🃏","🎲","🎲"];
+  memoryValues = symbols.sort(()=>Math.random()-0.5);
+  const grid=document.getElementById("memoryGrid");
+  grid.innerHTML="";
+  matchedCount=0;
+  memoryFirst=null; memoryLock=false;
+  document.getElementById("memoryStatus").textContent="Encontre os pares.";
+  memoryValues.forEach((sym,i)=>{
+    const card=document.createElement("div");
+    card.className="memory-card";
+    card.dataset.value=sym;
+    card.dataset.index=i;
+    card.textContent="❓";
+    card.onclick=()=>flipMemory(card);
+    grid.appendChild(card);
+  });
+}
+function flipMemory(card){
+  if(memoryLock || card.classList.contains("matched") || card.classList.contains("revealed")) return;
+  card.classList.add("revealed");
+  card.textContent=card.dataset.value;
+  sound("click");
+  if(!memoryFirst){
+    memoryFirst=card;
+    return;
+  }
+  memoryLock=true;
+  if(memoryFirst.dataset.value===card.dataset.value){
+    memoryFirst.classList.add("matched");
+    card.classList.add("matched");
+    matchedCount+=2;
+    chips += 3;
+    updateStats();
+    document.getElementById("memoryStatus").textContent="Par encontrado! Agora responda à questão bônus.";
+    const area = rand(areas);
+    renderQuestion("memoryQuestion", randomQuestion(area), 10, 7);
+    memoryFirst=null; memoryLock=false;
+    if(matchedCount===16){
+      document.getElementById("memoryStatus").textContent="Você encontrou todos os pares! Rodada concluída.";
+      sound("win");
+    }
+  }else{
+    document.getElementById("memoryStatus").textContent="Não formou par. Tente novamente.";
+    setTimeout(()=>{
+      memoryFirst.classList.remove("revealed");
+      card.classList.remove("revealed");
+      memoryFirst.textContent="❓";
+      card.textContent="❓";
+      memoryFirst=null; memoryLock=false;
+    },850);
+  }
+}
+
+/* Game 6: True/False */
+function newTF(){
+  registerPlay();
+  const area = rand(areas);
+  const item = randomQuestion(area);
+  let proposedIndex;
+  const shouldBeTrue = Math.random() < 0.5;
+  if(shouldBeTrue){
+    proposedIndex = item.correct;
+  }else{
+    const wrong = item.options.map((_,i)=>i).filter(i=>i!==item.correct);
+    proposedIndex = rand(wrong);
+  }
+  currentTF = {answer: shouldBeTrue};
+  document.getElementById("tfStatement").innerHTML =
+    `<div style="font-size:15px;color:#ffe477;margin-bottom:10px">${item.area}</div>` +
+    `<div style="font-size:20px;line-height:1.35">${item.question}</div>` +
+    `<div style="margin-top:16px;color:#9ffcff">A resposta correta seria: <b>${item.options[proposedIndex]}</b></div>`;
+  document.getElementById("tfStatus").textContent = "Essa resposta está correta? Verdadeiro ou falso.";
+}
+function answerTF(choice){
+  if(!currentTF) return;
+  if(choice===currentTF.answer){
+    document.getElementById("tfStatus").textContent="✅ Correto! +12 fichas e +8 pontos";
+    reward(12,8); sound("win");
+  }else{
+    document.getElementById("tfStatus").textContent="❌ Incorreto. Tente uma nova afirmação.";
+    sound("wrong");
+  }
+  currentTF = null;
+}
+
+/* Game 7: Coin */
+function flipCoinGame(){
+  registerPlay();
+  sound("spin");
+  const coin=document.getElementById("coin");
+  const qBox=document.getElementById("coinQuestion");
+  qBox.style.display="none";
+  let spins=0;
+  const anim=setInterval(()=>{
+    coin.style.transform=`rotateY(${spins*180}deg)`;
+    coin.textContent = spins%2===0 ? "CARA" : "COROA";
+    spins++;
+    if(spins>10){
+      clearInterval(anim);
+      const side = Math.random()<0.5 ? "CARA" : "COROA";
+      coin.textContent=side;
+      const area = rand(areas);
+      document.getElementById("coinStatus").textContent=`Saiu ${side}! Categoria sorteada: ${area}.`;
+      renderQuestion("coinQuestion", randomQuestion(area), 16, 11);
+      sound("soft");
+    }
+  },100);
+}
+
+/* Game 8: Lucky Boxes */
+function setupBoxes(){
+  const grid=document.getElementById("boxesGrid");
+  grid.innerHTML="";
+  document.getElementById("boxQuestion").style.display="none";
+  document.getElementById("boxStatus").textContent="Escolha uma caixa da sorte.";
+  for(let i=1;i<=6;i++){
+    const b=document.createElement("div");
+    b.className="lucky-box";
+    b.textContent=`CAIXA ${i}`;
+    b.onclick=()=>openLuckyBox(b,i);
+    grid.appendChild(b);
+  }
+}
+function openLuckyBox(box,i){
+  if(box.classList.contains("open")) return;
+  [...document.querySelectorAll(".lucky-box")].forEach(c=>c.style.pointerEvents="none");
+  const area=areas[(i*2)%areas.length];
+  box.classList.add("open");
+  box.innerHTML=`${area}<br>+25 fichas`;
+  document.getElementById("boxStatus").textContent=`A caixa revelou a área ${area}.`;
+  renderQuestion("boxQuestion", randomQuestion(area), 25, 18);
+  sound("click");
+}
+
+
+/* BANK OF QUESTIONS: file import + local persistence */
+function bankCount(){
+  return Object.values(questionBank).reduce((sum,list)=>sum+list.length,0);
+}
+function syncAreas(){
+  areas = Object.keys(questionBank).filter(a=>Array.isArray(questionBank[a]) && questionBank[a].length);
+  if(!areas.length) areas = ["Geral"];
+}
+function saveQuestionBank(){
+  try{
+    localStorage.setItem("casinoConhecimentoQuestionBank", JSON.stringify(questionBank));
+    localStorage.setItem("casinoConhecimentoQuestionBankSavedAt", new Date().toISOString());
+  }catch(e){}
+}
+function loadSavedQuestionBank(){
+  try{
+    const raw = localStorage.getItem("casinoConhecimentoQuestionBank");
+    if(!raw) return false;
+    const saved = JSON.parse(raw);
+    if(!saved || typeof saved!=="object") return false;
+    Object.keys(questionBank).forEach(k=>delete questionBank[k]);
+    Object.entries(saved).forEach(([area,list])=>{
+      if(Array.isArray(list)) questionBank[area]=list;
+    });
+    syncAreas();
+    return bankCount()>0;
+  }catch(e){ return false; }
+}
+function renderBankSummary(){
+  syncAreas();
+  document.getElementById("bankTotal").textContent = bankCount();
+  document.getElementById("bankAreas").textContent = areas.filter(a=>questionBank[a]?.length).length;
+  document.getElementById("bankSaved").textContent = "SALVO";
+  const list = document.getElementById("bankList");
+  if(!list) return;
+  const entries = Object.entries(questionBank).filter(([_,qs])=>Array.isArray(qs) && qs.length);
+  list.innerHTML = entries.length ? entries.map(([area,qs]) =>
+    `<div class="bank-row"><b>${escapeHtml(area)}</b><span>${qs.length} questões</span></div>`
+  ).join("") : `<div class="bank-row"><span>Nenhuma questão carregada.</span></div>`;
+}
+function normalizeAreaName(s){
+  return String(s||"Geral").trim().replace(/\s+/g," ");
+}
+function addImportedQuestions(items, mode="replace"){
+  if(mode==="replace"){
+    Object.keys(questionBank).forEach(k=>delete questionBank[k]);
+  }
+  let added=0;
+  items.forEach(item=>{
+    const area=normalizeAreaName(item.area);
+    if(!questionBank[area]) questionBank[area]=[];
+    if(item.question && Array.isArray(item.options) && item.options.length>=4 && Number.isInteger(item.correct)){
+      questionBank[area].push({
+        area,
+        question:String(item.question).trim(),
+        options:item.options.slice(0,4).map(v=>String(v).trim()),
+        correct:item.correct
+      });
+      added++;
+    }
+  });
+  syncAreas();
+  saveQuestionBank();
+  drawWheel();
+  renderBankSummary();
+  setupCardGame();
+  setupBoxes();
+  return added;
+}
+function parseBulkText(raw){
+  const text=String(raw||"").replace(/\r/g,"").replace(/\u00a0/g," ").trim();
+  const lines=text.split("\n").map(v=>v.trim()).filter(Boolean);
+  const out=[];
+  let area="Geral", current=null;
+
+  function finish(){
+    if(!current) return;
+    if(current.question && current.options.A && current.options.B && current.options.C && current.options.D && current.correct){
+      out.push({
+        area:current.area||area,
+        question:current.question.trim(),
+        options:[current.options.A,current.options.B,current.options.C,current.options.D],
+        correct:"ABCD".indexOf(current.correct.toUpperCase())
+      });
+    }
+    current=null;
+  }
+
+  for(const line0 of lines){
+    const line=line0.trim();
+    const a1=line.match(/^\[([^\]]+)\]$/);
+    if(a1){ finish(); area=normalizeAreaName(a1[1]); continue; }
+
+    const a2=line.match(/^(?:área|area|disciplina|categoria)\s*:\s*(.+)$/i);
+    if(a2){ finish(); area=normalizeAreaName(a2[1]); continue; }
+
+    let qm=line.match(/^(?:pergunta|quest[aã]o)\s*(?:\d+)?\s*[:\-]\s*(.+)$/i);
+    if(qm){ finish(); current={area,question:qm[1],options:{},correct:""}; continue; }
+
+    qm=line.match(/^\d+\s*[\.\-\)]\s*(.+)$/);
+    if(qm){ finish(); current={area,question:qm[1],options:{},correct:""}; continue; }
+
+    const opt=line.match(/^([A-Da-d])\s*[\)\.\-:]\s*(.+)$/);
+    if(opt && current){ current.options[opt[1].toUpperCase()]=opt[2]; continue; }
+
+    const ans=line.match(/^(?:resposta(?:\s+correta)?|gabarito)\s*[:\-]\s*([A-Da-d])\b/i);
+    if(ans && current){ current.correct=ans[1].toUpperCase(); finish(); continue; }
+
+    if(!current && line.length<55 && /^[A-ZÁÀÂÃÉÊÍÓÔÕÚÇ0-9 \-\/]+$/.test(line) && !/[.?]/.test(line)){
+      area=normalizeAreaName(line.replace(/[:\-]+$/,""));
+      continue;
+    }
+
+    if(current && Object.keys(current.options).length===0){
+      current.question += " " + line;
+    }
+  }
+  finish();
+  return out;
+}
+function parseJsonQuestions(raw){
+  const data = typeof raw==="string" ? JSON.parse(raw) : raw;
+  const out=[];
+  if(Array.isArray(data)){
+    data.forEach(item=>{
+      if(!item) return;
+      const opts = Array.isArray(item.options) ? item.options : [item.A,item.B,item.C,item.D];
+      let correct = item.correct;
+      if(typeof correct==="string") correct="ABCD".indexOf(correct.toUpperCase());
+      if(Number.isInteger(correct)) out.push({area:item.area||item.categoria||"Geral",question:item.question||item.pergunta,options:opts,correct});
+    });
+  }else if(data && typeof data==="object"){
+    Object.entries(data).forEach(([area,list])=>{
+      if(!Array.isArray(list)) return;
+      list.forEach(item=>{
+        if(!item) return;
+        const opts=Array.isArray(item.options)?item.options:[item.A,item.B,item.C,item.D];
+        let correct=item.correct;
+        if(typeof correct==="string") correct="ABCD".indexOf(correct.toUpperCase());
+        if(Number.isInteger(correct)) out.push({area,question:item.question||item.pergunta,options:opts,correct});
+      });
+    });
+  }
+  return out;
+}
+async function importQuestionFile(file){
+  if(!file) return;
+  const status=document.getElementById("bankStatus");
+  status.textContent="Lendo o arquivo...";
+  try{
+    const name=file.name.toLowerCase();
+    let items=[];
+    if(name.endsWith(".docx")){
+      if(typeof mammoth==="undefined") throw new Error("O leitor do Word não carregou. Abra a página com internet e tente novamente.");
+      const arrayBuffer=await file.arrayBuffer();
+      const result=await mammoth.extractRawText({arrayBuffer});
+      items=parseBulkText(result.value);
+    }else if(name.endsWith(".json")){
+      items=parseJsonQuestions(await file.text());
+    }else{
+      items=parseBulkText(await file.text());
+    }
+    if(!items.length) throw new Error("Não encontrei questões completas no formato Pergunta + A/B/C/D + Resposta.");
+    const mode=document.getElementById("importMode").value;
+    const added=addImportedQuestions(items,mode);
+    status.textContent=`✅ ${added} questões importadas. Banco atual: ${bankCount()} questões em ${areas.length} áreas.`;
+    sound("win");
+  }catch(err){
+    status.textContent="❌ "+err.message;
+    sound("wrong");
+  }
+}
+function importPastedQuestions(){
+  const raw=document.getElementById("bulkText").value;
+  const items=parseBulkText(raw);
+  if(!items.length){
+    document.getElementById("bankStatus").textContent="❌ Não encontrei questões completas no texto.";
+    return;
+  }
+  const mode=document.getElementById("importMode").value;
+  const added=addImportedQuestions(items,mode);
+  document.getElementById("bankStatus").textContent=`✅ ${added} questões importadas do texto.`;
+  sound("win");
+}
+function restoreDefaultBank(){
+  Object.keys(questionBank).forEach(k=>delete questionBank[k]);
+  Object.entries(JSON.parse(JSON.stringify(defaultQuestionBank))).forEach(([a,qs])=>questionBank[a]=qs);
+  syncAreas(); saveQuestionBank(); drawWheel(); renderBankSummary();
+  document.getElementById("bankStatus").textContent="✅ Questões padrão restauradas.";
+}
+function clearQuestionBank(){
+  Object.keys(questionBank).forEach(k=>delete questionBank[k]);
+  syncAreas(); saveQuestionBank(); drawWheel(); renderBankSummary();
+  document.getElementById("bankStatus").textContent="Banco limpo. Importe um arquivo para jogar.";
+}
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+}
+
+const questionFileInput = document.getElementById("questionFile");
+questionFileInput.addEventListener("change",e=>{
+  const file=e.target.files[0];
+  if(file) importQuestionFile(file);
+  e.target.value="";
+});
+const uploadZone=document.getElementById("uploadZone");
+["dragenter","dragover"].forEach(evt=>uploadZone.addEventListener(evt,e=>{
+  e.preventDefault(); uploadZone.classList.add("drag");
+}));
+["dragleave","drop"].forEach(evt=>uploadZone.addEventListener(evt,e=>{
+  e.preventDefault(); uploadZone.classList.remove("drag");
+}));
+uploadZone.addEventListener("drop",e=>{
+  const file=e.dataTransfer.files[0];
+  if(file) importQuestionFile(file);
+});
+
+/* init */
+loadSavedQuestionBank();
+syncAreas();
+updateStats();
+drawWheel();
+renderBankSummary();
+setupCardGame();
+startMemoryGame();
+setupBoxes();
+</script>
+</body>
+</html>
